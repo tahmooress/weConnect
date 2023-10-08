@@ -76,40 +76,10 @@ uml: ## Create UML diagram in diagram.puml file
 	@ test -e $(GOPLANTUML) || $(GOPLANTUML_DOWNLOAD)
 	@ $(GOPLANTUML) -recursive . > diagram.puml
 
-.PHONY: migrate
-migrate: ## base migrate	
-	@ test -e $(MIGRATE) || $(MIGRATE_DOWNLOAD)
-	@ $(MIGRATE) --version
-
-.PHONY: migrate-create
-migrate-create: ## create new migrate file	
-	@ test -e $(MIGRATE) || $(MIGRATE_DOWNLOAD)	
-	@ $(MIGRATE) create -ext sql -dir ./migrations -format '20060102150405' $(name)															
-
-.PHONY: migrate-up
-migrate-up:migrate ## Apply all up migrations	
-	@ test -e $(MIGRATE) || $(MIGRATE_DOWNLOAD) 	
-	@ $(MIGRATE) $(MIGRATE_CONFIG) up
-
-.PHONY:	migrate-down
-migrate-down:migrate ## Apply all down migrations
-	@ $(MIGRATE) $(MIGRATE_CONFIG) down $(step)
-
-.PHONY: migrate-recreate
-migrate-recreate:migrate ## Apply all up migrations
-	@ test -e $(MIGRATE) || $(MIGRATE_DOWNLOAD)
-	@ $(MIGRATE) $(MIGRATE_CONFIG) down -all && $(MIGRATE) $(MIGRATE_CONFIG) up
-
 .PHONY: env
 env: ## create env file from .env.example and read env file & export to terminal
 	@ test -e ${ROOT}/.env && echo ${ROOT}/.env exists || cp ${ROOT}/.env.example ${ROOT}/.env
 	@ export $(grep -v '^#' .env | xargs -d '\n')
-
-.PHONY: auth
-auth: ## create authentication for get internal Idpay packages
-	@ echo "machine $GIT_SRV\n\tlogin $GIT_SRV_LOGIN\n\tpassword $GIT_SRV_PWD" > ~/.netrc
-	@ git config --global --add url."git@git.wki.ir:".insteadOf "https://git.wki.ir/"
- 	# @ export GOPRIVATE="$GIT_SRV/*"
 
 .PHONY: gofumpt
 gofumpt: ## Lint the files
