@@ -23,7 +23,7 @@ var InvalidDataFormat = errors.New("invalid data format")
 
 func main() {
 	path := flag.String("path", "", "path of data source file")
-	workers := flag.Int("workers", 10, "number of workers")
+	workers := flag.Int("workers", 5, "number of workers")
 
 	flag.Parse()
 
@@ -70,7 +70,8 @@ func run(ctx context.Context, repo repository.Repository, filePath string, worke
 	taskQueue := make(chan func() error)
 	go func() {
 		defer close(taskQueue)
-		for record := range records {
+		for r := range records {
+			record := r
 			taskQueue <- func() error {
 				statistics, err := statisticsBuilder(record)
 				if err != nil {

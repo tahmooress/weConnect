@@ -17,7 +17,7 @@ COPY . .
 RUN apk update
 RUN apk add make # install make
 # Build the Go app
-RUN make build BUILD_OUTPUT=/app/bin/main
+RUN make build BUILD_OUTPUT=/app/bin/server
 
 # Start a new stage from scratch
 FROM alpine:latest
@@ -33,12 +33,11 @@ RUN apk add --update curl && \
 WORKDIR /root/
 
 # Copy the Pre-built binary file from the previous stage. Observe we also copied the .env file
-COPY --from=builder /app/bin/main .
+COPY --from=builder /app/bin/server .
 COPY --from=builder /app/.env .       
-COPY --from=builder /app/config.yaml .
 
 # Expose port 8080 to the outside world
 # EXPOSE 8080
 
 #Command to run the executable
-CMD ["./main"]
+CMD ["./server"]
